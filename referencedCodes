@@ -1,0 +1,115 @@
+//FIRST ONE
+}pseudomonitor DiningPhilosophers 
+{
+   enum State {THINKING, HUNGRY, EATING};
+   State[] states = new State[5];
+   Condition[] self = new Condition[5];
+
+
+   public DiningPhilosophers {
+      for(int i = 0; i < 5; i++) {
+         state[i] = State.thinking;
+      }
+   }
+
+
+   public void takeForks(int i) {
+      state[i] = State.HUNGRY;
+      test(i);
+      if(state[i] != State.EATING)
+         self[i].wait;
+   }
+
+
+   public void returnForks(int i) {
+      state[i] = State.THINKING;
+      // test left and right neighbors
+      test((i + 4) % 5);
+      test((i + 1) % 5);
+   }
+
+   private void test(int i) {
+      if( (state[(i + 4) % 5] != State.EATING) &&
+         (state[i] == State.HUNGRY) &&
+         (state[(i + 1) % 5] != State.EATING) ) {
+            state[i] = State.EATING;
+            self[i].signal;
+         }
+   }
+}
+
+
+//SECOND ONE
+MONITOR:
+
+DATA:
+
+	condition can_eat[NUM_PHILS];
+	enum states {THINKING, HUNGRY, EATING} state[NUM_PHILS-1];
+	int index;
+
+INITIALIZATION:
+
+	for (index=0; index<NUM_PHILS; index++) {
+		flags[index] = THINKING;
+	}
+
+MONITOR PROCEDURES:
+
+	/* request the right to pickup chopsticks and eat */
+	entry void pickup(int mynum) {
+
+		/* announce that we're hungry */
+		state[mynum] = HUNGRY;
+
+		/* if neighbor's aren't eating, proceed */
+		if ((state[mynum-1 mod NUM_PHILS] != EATING) &&
+			(state [mynum+1 mod NUM_PHILS] != EATING)) {
+			state[mynum] = EATING;
+		}
+
+		/* otherwise wait for them */
+		else {
+
+			can_eat[mynum].wait;
+
+			/* ready to eat now */
+			state[mynum] = EATING;
+		}
+	}
+
+	/* announce that we're finished, give others a chance */
+	entry void putdown(int mynum) {
+
+		/* announce that we're done */
+		state[mynum] = THINKING;
+
+		/* give left (lower) neighbor a chance to eat */
+		if ((state [mynum-1 mod NUM_PHILS] == HUNGRY) &&
+		(state [mynum-2 mod NUM_PHILS] != EATING)) {
+			can_eat[mynum-1 mod NUM_PHILS].signal;
+		}
+
+		/* give right (higher) neighbor a chance to eat */
+		if ((state [mynum+1 mod NUM_PHILS] == HUNGRY) &&
+		(state [mynum+2 mod NUM_PHILS] != EATING)) {
+			can_eat[mynum+1 mod NUM_PHILS].signal;
+		}
+}
+
+PHILOSOPHER:
+
+	/* find out our id, then repeat forever */
+	me = get_my_id();
+	while (TRUE) {
+
+		/* think, wait, eat, do it all again ... */
+		think();
+		pickup(me);
+		eat();
+		putdown(me);
+
+	}
+	\end{minted}
+
+
