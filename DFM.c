@@ -6,7 +6,7 @@
 #define N 5
 
 enum states {THINKING, HUNGRY, EATING} state[N];
-
+sem_t mutex;
 
 void * philosopher(void *num);
 void pick_up(int);
