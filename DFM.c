@@ -24,6 +24,11 @@ void *philosopher(void *num)
     }
 }
 
+/*
+ı write mynum+1 to gain logical print 
+like philosopher1 eating instead philosopher0...
+
+*/
 void pick_up(int mynum)
 {
     sem_wait(&mutex);
