@@ -112,4 +112,41 @@ PHILOSOPHER:
 	}
 	\end{minted}
 
+THIRD ONE:FROM https://github.com/choonghuh/CS360_Dining_Philosophers/blob/master/philot.c
 
+int main (void)
+{
+int i, rd;
+int pid;
+
+pthread_t philosopher[5];
+
+/*
+Below blocks initialize five threads and assign them the initial function to be run.
+When finished executing, the program cleans up the memory and terminates.
+*/
+
+    for(i = 0; i < 5; i++)
+    {
+        if(pthread_mutex_init(&chopsticks[i], NULL) != 0)
+            printf("Failed to initialize mutex\n");
+    }
+    
+    for(i = 0; i < 5; i++)
+    {
+        if(pthread_create(&philosopher[i], NULL, activity, (void *) &philoNum[i])  != 0)
+            printf("Failed to initialize thread\n") ;
+    }
+    
+    for(i = 0; i < 5; i++)
+    {
+        pthread_join(philosopher[i], NULL);
+    }
+    
+    for(i = 0; i < 5; i++)
+    {
+        pthread_mutex_destroy(&chopsticks[i]);
+    }
+	
+	return 0;
+}
