@@ -4,7 +4,7 @@
 
 #define N 5
 enum states {THINKING, HUNGRY, EATING} state[N];
-sem_t mutex;
+sem_t s;
 
 void * philosopher(void *num);
 void pick_up(int);
@@ -31,24 +31,24 @@ like philosopher1 eating instead philosopher0...
 */
 void pick_up(int mynum)
 {
-    sem_wait(&mutex);
+    sem_wait(&s);
     state[mynum] = HUNGRY;
     printf("Philosopher %d gives thinking a rest because she is HUNGRY\n",mynum+1);
     test(mynum);
-    sem_post(&mutex);
+    sem_post(&s);
    
 }
 
 
 void put_down(int mynum)
 {
-    sem_wait(&mutex);
+    sem_wait(&s);
     state[mynum] = THINKING;
     printf("Philosopher %d is putting down fork\n" ,mynum+1);
     printf("Philosopher %d is THINKING about universe\n",mynum+1);
     test((mynum+4) % N);
     test((mynum+1) % N);
-    sem_post(&mutex);
+    sem_post(&s);
     sleep(2);
 }
 void test(int mynum)
@@ -67,7 +67,7 @@ int main()
 {
     int i;
     pthread_t tphilosopher[N];
-    sem_init(&mutex,0,1); //initialize semaphore
+    sem_init(&s,0,1); //initialize semaphore
      
     for(i=0;i<N;i++){
     
